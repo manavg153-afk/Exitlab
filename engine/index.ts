@@ -12,6 +12,17 @@ export {
 } from './scenario';
 export type { ScenarioOptions } from './scenario';
 export { emptyHeat, summarizeWaits, normalizeHeat } from './metrics';
-export { simulate, simulateDetailed } from './simulate';
-export type { DetailedRun } from './simulate';
+export {
+  simulate,
+  simulateDetailed,
+  createSimulation,
+  stepSimulation,
+  finishSimulation,
+} from './simulate';
+export type {
+  DetailedRun,
+  SimulationState,
+  SimFrame,
+  AgentFrame,
+} from './simulate';
 export { compareRuns, runComparison, pctChange } from './compare';

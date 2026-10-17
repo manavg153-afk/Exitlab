@@ -411,3 +411,24 @@ describe('comparison', () => {
     expect(cmp.scenario).toBe(slow);
   });
 });
+
+// ---------- stepwise API & trace tests ----------
+
+describe('stepwise simulation API', () => {
+  it('stepping produces the exact same result as full simulation', () => {
+    const l = room(9, 5);
+    addExit(l, 'A', 0, 2);
+    addExit(l, 'B', 8, 2);
+    const s = at([[2, 2], [6, 2], [7, 2]]);
+
+    const full = simulateDetailed(l, s);
+    const withTrace = simulateDetailed(l, s, { recordTrace: true });
+
+    expect(withTrace.result.metrics).toEqual(full.result.metrics);
+    expect(withTrace.frames).toBeDefined();
+    expect(withTrace.frames!.length).toBe(full.result.metrics.clearanceTicks + 1);
+    expect(withTrace.frames![0].tick).toBe(0);
+    expect(withTrace.frames![full.result.metrics.clearanceTicks].remaining).toBe(0);
+  });
+});
+
