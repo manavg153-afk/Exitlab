@@ -3,7 +3,7 @@
 > **For Claude: read this file first, before starting any phase.** It is the source of truth for project status.
 > Update it at the end of every piece of work (what changed, what is next, any new decisions). Do not re-examine every file; trust this file and open only what the next step touches.
 
-Last updated: 2026-10-17 (Phases 0–4 MVP Frontend & Engine Complete)
+Last updated: 2026-10-23 (Phase 6 Polish and Report Complete)
 
 ## What ExitLab is
 
@@ -20,9 +20,9 @@ Stack: React + TypeScript (Vite), HTML Canvas, Recharts, localStorage + JSON imp
 | 2 | Simulation core | **DONE.** Engine + stepwise animation API (`createSimulation`, `stepSimulation`, `finishSimulation`, `recordTrace`). UI playback controls (play/pause/step/restart/instant run, 0.5x..5x speed slider, live remaining/queue counters). |
 | 3 | Scenarios and disruptions | **DONE.** Exit block/unblock toggles, click-to-place extra obstacles, occupant density slider, repeatable seed selector with dice button. |
 | 4 | Analysis (metrics, heatmap, comparison charts) | **DONE.** KPIs (clearance time, max queue, wait times, unreachable trapped count), Exit usage throughput cards, canvas Heatmap overlay toggle, Recharts progression line chart comparing scenario vs baseline. |
-| 5 | Explanation engine, layout comparison | **PARTLY / MVP Rule-Based Done.** Integrated bottleneck explanations (door capacity, queue severity, disconnected regions, clearance impact). Full NLP/advanced layout diffing optional. |
-| 6 | Polish and report | Next up |
-| 7 | Optional extras | Not started |
+| 5 | Explanation engine, layout comparison | **DONE (Rule-based).** Integrated bottleneck explanations (door capacity, queue severity, disconnected regions, clearance impact). |
+| 6 | Polish and report | **DONE.** Scenario report export (print/PDF layout + downloadable Markdown), first-time user tutorial overlay modal, keyboard accessibility controls (`Space`, `S`, `R`, `H`), layout empty-state warnings, responsive UI, README documentation with demo script. |
+| 7 | Optional extras | Open for future exploration (cloud saves, multi-floor, smoke/fire spread). |
 
 ## Files Structure
 
@@ -40,6 +40,9 @@ exitlab/
     engine.test.ts      RNG + BFS tests
     simulate.test.ts    Simulation, invariants, scenario, comparison, step API tests
   src/
+    components/
+      TutorialModal.tsx First-time onboarding overlay with 60s demo guide & keyboard shortcuts
+      ReportModal.tsx   Print-ready evacuation stress-test report with Markdown export
     editor/
       FloorPlanEditor.tsx  Canvas grid editor with paint tools, undo/redo, capacity inputs, import/export
       presets.ts          3 preset building layouts including 60s Demo 2-wing complex
@@ -51,15 +54,16 @@ exitlab/
     results/
       AnalysisResults.tsx KPIs grid, throughput breakdown, baseline comparison, bottleneck explanations
       ComparisonCharts.tsx Recharts line chart of occupants remaining over time (baseline vs current)
-    App.tsx               Main application shell connecting editor, simulation, and analysis tabs
+    App.tsx               Main application shell connecting editor, simulation, modals, and hotkeys
     main.tsx              React DOM root
   SPEC.md                 Rules spec v0.2 with Section 10 settled rules
   progress.md             This file (source of truth)
   flow.md                 Full roadmap and specifications
+  README.md               Comprehensive project overview, 60s demo script, and quickstart
   package.json            Dependencies and scripts
   tsconfig.json           TypeScript strict configuration
   vite.config.ts          Vite config with React plugin
-  index.html              HTML entry point
+  index.html              HTML entry point with print stylesheets
   .gitignore              Standard ignore list
 ```
 
@@ -68,8 +72,9 @@ exitlab/
 1. **Stepwise Simulation API:** Added `createSimulation`, `stepSimulation`, and `finishSimulation` to `engine/simulate.ts` so the UI canvas can animate frames at arbitrary framerates while keeping 100% deterministic parity with batch `simulate`.
 2. **Duplicated files cleaned:** Deleted obsolete `_1` files (`types_1.ts`, `bfs_1.ts`, `progress_1.md`, `SPEC_1.md`, `SPEC_2.md`) and updated `SPEC.md` to v0.2.
 3. **Demo Story Ready:** Included the Two-Wing complex preset where blocking Exit B forces occupants to choke the 1-cell central hallway, creating an immediate visual demonstration of bottlenecks, queues, and clearance delays.
+4. **Phase 6 Polish Finished:** Integrated full report generation (print-friendly CSS + dynamic Markdown export), interactive tutorial modal, keyboard shortcuts, defensive UI validation (alerting when layout lacks exits or spawn cells), and comprehensive README.
 
 ## Next steps (in order)
 
 1. Run `npm install` on user machine when Node.js is installed.
-2. Phase 6 Polish: Report summary export (print/markdown/JSON), responsive layout tweaks, first-time user tutorial overlay.
+2. Optional extras (Phase 7): Cloud saves or multi-floor stairs if desired.
