@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Layout, Scenario, Disruptions, RunMetrics, Comparison } from '../engine/types';
+import type { Layout, Scenario, Disruptions, RunMetrics, Comparison, ExitDef } from '../../engine/types';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -53,7 +53,7 @@ Generated on: ${new Date().toLocaleString()}
 - **Unreachable / Trapped:** ${metrics.unreachableCount} occupants
 
 ## 3. Exit Throughput Usage
-${layout.exits.map((ex) => `- Exit ${ex.id} (capacity ${ex.capacity}/tick): ${metrics.exitUsage[ex.id] || 0} evacuated`).join('\n')}
+${layout.exits.map((ex: ExitDef) => `- Exit ${ex.id} (capacity ${ex.capacity}/tick): ${metrics.exitUsage[ex.id] || 0} evacuated`).join('\n')}
 
 ${
   comparison
@@ -228,7 +228,7 @@ ${
                 Throughput by Exit
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                {layout.exits.map((ex) => (
+                {layout.exits.map((ex: ExitDef) => (
                   <div key={ex.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', background: '#0f172a', padding: '0.4rem 0.75rem', borderRadius: '0.25rem' }}>
                     <span>Exit {ex.id} (flow limit: {ex.capacity} people/tick)</span>
                     <strong style={{ color: disruptions.blockedExits.includes(ex.id) ? '#ef4444' : '#22c55e' }}>
