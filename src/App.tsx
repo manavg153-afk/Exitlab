@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { Layout, Scenario, Disruptions, RunMetrics, Comparison } from '../engine/types';
 import {
   createScenario,
@@ -17,11 +17,19 @@ import { SimulationView } from './render/SimulationView';
 import { ScenarioPanel } from './scenario/ScenarioPanel';
 import { AnalysisResults } from './results/AnalysisResults';
 import { ComparisonCharts } from './results/ComparisonCharts';
+import { TutorialModal } from './components/TutorialModal';
+import { ReportModal } from './components/ReportModal';
 
 export function App() {
   // Current tab: 'editor' | 'simulation'
   const [activeTab, setActiveTab] = useState<'editor' | 'simulation'>('editor');
   const [selectedTool, setSelectedTool] = useState<Tool>('WALL');
+
+  // Modals state
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(() => {
+    return !localStorage.getItem('exitlab_tutorial_seen');
+  });
+  const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
 
   // Layout state
   const [layout, setLayout] = useState<Layout>(() => {
@@ -71,6 +79,11 @@ export function App() {
     localStorage.setItem('exitlab_layout', JSON.stringify(layout));
   }, [layout]);
 
+  const handleCloseTutorial = () => {
+    setIsTutorialOpen(false);
+    localStorage.setItem('exitlab_tutorial_seen', 'true');
+  };
+
   // Ensure occupant count doesn't exceed spawn cells
   useEffect(() => {
     if (occupantCount > spawnCapacity && spawnCapacity > 0) {
@@ -90,7 +103,7 @@ export function App() {
   }, [layout, seed, occupantCount, spawnCapacity, disruptions]);
 
   // Reset/rebuild simulation when scenario or layout changes
-  const resetSimulation = () => {
+  const resetSimulation = useCallback(() => {
     if (animTimerRef.current) clearInterval(animTimerRef.current);
     setIsPlaying(false);
 
@@ -114,14 +127,14 @@ export function App() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [layout, scenario]);
 
   useEffect(() => {
     resetSimulation();
-  }, [scenario, layout]);
+  }, [resetSimulation]);
 
   // Step simulation forward
-  const handleStep = () => {
+  const handleStep = useCallback(() => {
     if (!simState || simState.done) return;
     const frame = stepSimulation(simState);
     if (frame) {
@@ -132,7 +145,7 @@ export function App() {
       const finished = finishSimulation(simState);
       setLatestMetrics(finished.result.metrics);
     }
-  };
+  }, [simState]);
 
   // Run full simulation instantly (for quick comparison or baseline capture)
   const handleRunFull = () => {
@@ -154,6 +167,33 @@ export function App() {
     });
     setIsPlaying(false);
   };
+
+  // Keyboard accessibility controls for simulation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in an input
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsPlaying((prev) => !prev);
+      } else if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        handleStep();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        resetSimulation();
+      } else if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        setShowHeatmap((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleStep, resetSimulation]);
 
   // Play / Pause timer loop
   useEffect(() => {
@@ -227,6 +267,8 @@ export function App() {
           borderBottom: '1px solid #1e293b',
           paddingBottom: '0.75rem',
           marginBottom: '1rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
         }}
       >
         <div>
@@ -250,11 +292,12 @@ export function App() {
           </p>
         </div>
 
-        {/* Tab & Preset selection */}
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        {/* Tab, Preset & Action buttons */}
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Preset selector */}
           <select
             value={layout.name}
+            aria-label="Select layout preset"
             onChange={(e) => {
               const selected = PRESET_LAYOUTS.find((p) => p.name === e.target.value);
               if (selected) {
@@ -319,6 +362,44 @@ export function App() {
               ▶️ Simulation & Stress-Test
             </button>
           </div>
+
+          {/* Quick Help & Export Report Buttons */}
+          <button
+            onClick={() => setIsReportOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              padding: '0.4rem 0.75rem',
+              borderRadius: '0.375rem',
+              background: '#047857',
+              border: 'none',
+              color: '#fff',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            📄 Report
+          </button>
+          <button
+            onClick={() => setIsTutorialOpen(true)}
+            aria-label="Open Tutorial"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              padding: '0.4rem 0.6rem',
+              borderRadius: '0.375rem',
+              background: '#334155',
+              border: 'none',
+              color: '#fff',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            ❓ Help
+          </button>
         </div>
       </header>
 
@@ -326,7 +407,7 @@ export function App() {
       <main
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 340px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
           gap: '1rem',
           flex: 1,
         }}
@@ -340,6 +421,7 @@ export function App() {
             borderRadius: '0.5rem',
             padding: '1rem',
             border: '1px solid #1e293b',
+            minHeight: '520px',
           }}
         >
           {activeTab === 'editor' ? (
@@ -361,11 +443,14 @@ export function App() {
                   background: '#1e293b',
                   padding: '0.5rem 0.75rem',
                   borderRadius: '0.375rem',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
                 }}
               >
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button
                     onClick={() => setIsPlaying(!isPlaying)}
+                    aria-label={isPlaying ? 'Pause simulation' : 'Play simulation'}
                     style={{
                       padding: '0.4rem 0.8rem',
                       borderRadius: '0.375rem',
@@ -377,11 +462,12 @@ export function App() {
                       fontSize: '0.8rem',
                     }}
                   >
-                    {isPlaying ? '⏸ Pause' : '▶ Play'}
+                    {isPlaying ? '⏸ Pause (Space)' : '▶ Play (Space)'}
                   </button>
                   <button
                     onClick={handleStep}
                     disabled={isPlaying || simState?.done}
+                    aria-label="Step 1 tick"
                     style={{
                       padding: '0.4rem 0.6rem',
                       borderRadius: '0.375rem',
@@ -392,10 +478,11 @@ export function App() {
                       fontSize: '0.8rem',
                     }}
                   >
-                    ⏭ Step
+                    ⏭ Step (S)
                   </button>
                   <button
                     onClick={resetSimulation}
+                    aria-label="Restart simulation"
                     style={{
                       padding: '0.4rem 0.6rem',
                       borderRadius: '0.375rem',
@@ -406,10 +493,11 @@ export function App() {
                       fontSize: '0.8rem',
                     }}
                   >
-                    🔄 Restart
+                    🔄 Restart (R)
                   </button>
                   <button
                     onClick={handleRunFull}
+                    aria-label="Run full simulation instantly"
                     style={{
                       padding: '0.4rem 0.6rem',
                       borderRadius: '0.375rem',
@@ -432,6 +520,7 @@ export function App() {
                     <button
                       key={speed}
                       onClick={() => setSpeedMultiplier(speed)}
+                      aria-label={`Set speed to ${speed}x`}
                       style={{
                         padding: '0.2rem 0.4rem',
                         borderRadius: '0.25rem',
@@ -469,6 +558,8 @@ export function App() {
                   borderRadius: '0.375rem',
                   fontSize: '0.8rem',
                   color: '#94a3b8',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
                 }}
               >
                 <span>
@@ -495,7 +586,7 @@ export function App() {
         </section>
 
         {/* Right Column: Disruptions & Scenario Settings + Analysis */}
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto' }}>
+        <aside style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '380px' }}>
           <ScenarioPanel
             layout={layout}
             scenario={scenario}
@@ -532,6 +623,19 @@ export function App() {
       >
         ExitLab is an educational comparative estimate simulator, not a life-safety certification tool.
       </footer>
+
+      {/* Modals */}
+      <TutorialModal isOpen={isTutorialOpen} onClose={handleCloseTutorial} />
+      <ReportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        layout={layout}
+        scenario={scenario}
+        disruptions={disruptions}
+        metrics={latestMetrics}
+        baselineMetrics={baselineMetrics}
+        comparison={comparison}
+      />
     </div>
   );
 }

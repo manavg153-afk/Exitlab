@@ -60,6 +60,20 @@ export function ScenarioPanel({
         </p>
       </div>
 
+      {/* Validation alert if 0 exits */}
+      {layout.exits.length === 0 && (
+        <div style={{ background: '#450a0a', border: '1px solid #dc2626', borderRadius: '0.375rem', padding: '0.6rem 0.75rem', fontSize: '0.75rem', color: '#fecaca' }}>
+          ⚠️ <strong>No Exits:</strong> Please place at least one Exit cell in the floor plan to run evacuation simulations.
+        </div>
+      )}
+
+      {/* Validation alert if 0 spawn capacity */}
+      {spawnCapacity === 0 && (
+        <div style={{ background: '#451a03', border: '1px solid #d97706', borderRadius: '0.375rem', padding: '0.6rem 0.75rem', fontSize: '0.75rem', color: '#fed7aa' }}>
+          ⚠️ <strong>No Spawn Area:</strong> Paint at least one SPAWN cell with the floor editor so occupants can be placed.
+        </div>
+      )}
+
       {/* Exit toggles */}
       <div>
         <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#cbd5e1', marginBottom: '0.5rem' }}>
@@ -161,7 +175,7 @@ export function ScenarioPanel({
             min={1}
             max={Math.max(1, spawnCapacity)}
             value={scenario.occupantCount}
-            disabled={isSimulating}
+            disabled={isSimulating || spawnCapacity === 0}
             onChange={(e) => onUpdateOccupantCount(parseInt(e.target.value, 10))}
             style={{ width: '100%' }}
           />
