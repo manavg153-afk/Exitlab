@@ -292,8 +292,6 @@ export function FloorPlanEditor({
           borderRadius: '0.5rem',
           border: '1px solid #1e293b',
           display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
           padding: '1rem',
         }}
       >
@@ -306,6 +304,7 @@ export function FloorPlanEditor({
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
           style={{
+            margin: 'auto',
             cursor: isSimulating ? 'default' : 'crosshair',
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
             borderRadius: '4px',
