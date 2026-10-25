@@ -196,7 +196,7 @@ export function FloorPlanEditor({
 
   const tools: { tool: Tool; label: string; icon: string; color: string }[] = [
     { tool: 'WALL', label: 'Wall', icon: '🧱', color: '#334155' },
-    { tool: 'DOOR', label: 'Door', icon: '🚪', color: '#3b82f6' },
+    { tool: 'DOOR', label: 'Door', icon: '🚪', color: '#f59e0b' },
     { tool: 'EXIT', label: 'Exit', icon: '🟢', color: '#22c55e' },
     { tool: 'OBSTACLE', label: 'Obstacle', icon: '📦', color: '#64748b' },
     { tool: 'SPAWN', label: 'Spawn Area', icon: '👥', color: '#0284c7' },

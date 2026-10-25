@@ -5,7 +5,7 @@ export const CELL_SIZE = 28; // pixels per cell
 export const CELL_COLORS: Record<CellType, string> = {
   EMPTY: '#1e293b',    // dark slate open floor
   WALL: '#020617',     // almost black wall
-  DOOR: '#3b82f6',     // blue door
+  DOOR: '#f59e0b',     // amber/orange door
   EXIT: '#22c55e',     // green exit
   OBSTACLE: '#64748b', // slate debris/obstacle
   SPAWN: '#0284c7',    // cyan/sky spawn area
