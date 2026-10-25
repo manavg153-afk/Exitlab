@@ -20,6 +20,7 @@ import { ComparisonCharts } from './results/ComparisonCharts';
 import { TutorialModal } from './components/TutorialModal';
 import { ReportModal } from './components/ReportModal';
 import { AddFloorModal } from './components/AddFloorModal';
+import { AssistantPanel } from './components/AssistantPanel';
 
 export function App() {
   // Current tab: 'editor' | 'simulation'
@@ -672,6 +673,14 @@ export function App() {
             showHeatmap={showHeatmap}
             onToggleHeatmap={() => setShowHeatmap(!showHeatmap)}
             onSaveAsBaseline={() => setBaselineMetrics(latestMetrics)}
+          />
+
+          <AssistantPanel
+            metrics={latestMetrics}
+            baselineMetrics={baselineMetrics}
+            comparison={comparison}
+            layout={layout}
+            disruptions={disruptions}
           />
         </aside>
       </main>

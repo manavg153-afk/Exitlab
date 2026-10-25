@@ -22,7 +22,8 @@ Stack: React + TypeScript (Vite), HTML Canvas, Recharts, localStorage + JSON imp
 | 4 | Analysis (metrics, heatmap, comparison charts) | **DONE.** KPIs (clearance time, max queue, wait times, unreachable trapped count), Exit usage throughput cards, canvas Heatmap overlay toggle, Recharts progression line chart comparing scenario vs baseline. |
 | 5 | Explanation engine, layout comparison | **DONE (Rule-based).** Integrated bottleneck explanations (door capacity, queue severity, disconnected regions, clearance impact). |
 | 6 | Polish and report | **DONE.** Scenario report export (print/PDF layout + downloadable Markdown), first-time user tutorial overlay modal, keyboard accessibility controls (`Space`, `S`, `R`, `H`), layout empty-state warnings, responsive UI, README documentation with demo script. |
-| 7 | Optional extras | Open for future exploration (cloud saves, multi-floor, smoke/fire spread). |
+| 7 | Simulation Assistant (Agent 37) | **DONE.** Decoupled Node.js backend (`backend/server.js`, `backend/agent37Adapter.js`) accepting `POST /api/assistant/run-question` with compact metrics; React `AssistantPanel` with loading, empty, success, and error states; safety disclaimers; server-side environment variables for secrets. |
+| 8 | Optional extras | Open for future exploration (cloud saves, multi-floor, smoke/fire spread). |
 
 ## Post-launch fixes and features (all merged to main)
 
@@ -32,6 +33,7 @@ Stack: React + TypeScript (Vite), HTML Canvas, Recharts, localStorage + JSON imp
 | **Canvas clipping fix** — Left wing / Exit A of Two-Wing Complex was clipped when canvas was wider than the flex container. Replaced `justifyContent: 'center'` + `alignItems: 'center'` on the overflow container with `margin: 'auto'` on the canvas element so scrolling works correctly | `src/editor/FloorPlanEditor.tsx`, `src/render/SimulationView.tsx` | `be027c1` |
 | **Add Floor feature** — New `＋ Add Floor` option at bottom of Preset dropdown. Shows `AddFloorModal` (name input + Create/Cancel). Creates an empty floor via `createEmptyFloor()`, stores custom floors in `localStorage` key `exitlab_custom_floors`, active layout in `exitlab_layout`. Sentinel value `__ADD_NEW_FLOOR__` detects the action in the `<select>` onChange handler. | `src/components/AddFloorModal.tsx` (new), `src/editor/presets.ts`, `src/App.tsx` | `364a214` |
 | **Door color change** — Door cells changed from blue (`#3b82f6`) to amber (`#f59e0b`) in canvas renderer; Door tool button label color also updated to match | `src/render/canvasRenderer.ts`, `src/editor/FloorPlanEditor.tsx` | `66b9904` |
+| **Agent 37 Simulation Assistant** — Added decoupled backend HTTP service with `POST /api/assistant/run-question` and `GET /api/health`; frontend `AssistantPanel` component in right aside with empty, loading, success, and error states; quick-suggestion chips; safety disclaimers; dev proxy in `vite.config.ts`. | `backend/server.js`, `backend/agent37Adapter.js`, `backend/package.json`, `src/components/AssistantPanel.tsx`, `src/App.tsx`, `vite.config.ts`, `README.md` | Pending |
 
 ## Current git state
 

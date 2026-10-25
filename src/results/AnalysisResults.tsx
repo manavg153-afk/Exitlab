@@ -20,6 +20,7 @@ export function AnalysisResults({
   onToggleHeatmap,
   onSaveAsBaseline,
 }: AnalysisResultsProps) {
+
   if (!metrics) {
     return (
       <div
@@ -32,7 +33,7 @@ export function AnalysisResults({
           fontSize: '0.85rem',
         }}
       >
-        Run simulation to view analysis metrics & bottleneck detection.
+        Run simulation to view analysis metrics &amp; bottleneck detection.
       </div>
     );
   }
@@ -74,7 +75,7 @@ export function AnalysisResults({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f8fafc' }}>
-          📊 Metrics & Analysis
+          📊 Metrics &amp; Analysis
         </h3>
         <button
           onClick={onToggleHeatmap}
@@ -150,7 +151,7 @@ export function AnalysisResults({
           <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#cbd5e1' }}>
             {avgWaitSec}s{' '}
             <span style={{ fontSize: '0.75rem', fontWeight: 400, color: '#64748b' }}>
-              (max { (metrics.maxWait * 0.5).toFixed(1) }s)
+              (max {(metrics.maxWait * 0.5).toFixed(1)}s)
             </span>
           </div>
         </div>
