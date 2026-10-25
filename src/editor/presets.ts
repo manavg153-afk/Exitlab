@@ -187,3 +187,29 @@ export const PRESET_LAYOUTS: Layout[] = [
   createClassroomPreset(),
   createRetailPreset(),
 ];
+
+/**
+ * Creates an empty layout of standard grid dimensions (25x15)
+ * with perimeter walls, but with a completely blank floor inside.
+ * No preset-specific geometry, no obstacles, no spawns, and no exits.
+ */
+export function createEmptyFloor(name: string, width = 25, height = 15): Layout {
+  const cells: Layout['cells'] = Array.from({ length: height }, (_, y) =>
+    Array.from({ length: width }, (_, x) => {
+      if (x === 0 || y === 0 || x === width - 1 || y === height - 1) {
+        return { type: 'WALL' };
+      }
+      return { type: 'EMPTY' };
+    }),
+  );
+
+  return {
+    version: 1,
+    name,
+    width,
+    height,
+    cells,
+    exits: [],
+  };
+}
+

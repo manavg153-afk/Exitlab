@@ -11,7 +11,7 @@ import {
   type SimulationState,
   type SimFrame,
 } from '../engine';
-import { PRESET_LAYOUTS } from './editor/presets';
+import { PRESET_LAYOUTS, createEmptyFloor } from './editor/presets';
 import { FloorPlanEditor, type Tool } from './editor/FloorPlanEditor';
 import { SimulationView } from './render/SimulationView';
 import { ScenarioPanel } from './scenario/ScenarioPanel';
@@ -19,6 +19,7 @@ import { AnalysisResults } from './results/AnalysisResults';
 import { ComparisonCharts } from './results/ComparisonCharts';
 import { TutorialModal } from './components/TutorialModal';
 import { ReportModal } from './components/ReportModal';
+import { AddFloorModal } from './components/AddFloorModal';
 
 export function App() {
   // Current tab: 'editor' | 'simulation'
@@ -30,6 +31,19 @@ export function App() {
     return !localStorage.getItem('exitlab_tutorial_seen');
   });
   const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
+  const [isAddFloorOpen, setIsAddFloorOpen] = useState<boolean>(false);
+
+  // Custom floors state (persisted across sessions via localStorage)
+  const [customFloors, setCustomFloors] = useState<Layout[]>(() => {
+    const saved = localStorage.getItem('exitlab_custom_floors');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+    }
+    return [];
+  });
 
   // Layout state
   const [layout, setLayout] = useState<Layout>(() => {
@@ -41,6 +55,39 @@ export function App() {
     }
     return PRESET_LAYOUTS[0]; // Default to Demo preset
   });
+
+  // All available selectable layouts (built-in presets + user custom floors)
+  const allLayouts = useMemo(() => {
+    return [...PRESET_LAYOUTS, ...customFloors];
+  }, [customFloors]);
+
+  // Keep custom floors in sync if the current active layout belongs to custom floors and is edited
+  const handleLayoutChange = useCallback((newLayout: Layout) => {
+    setLayout(newLayout);
+    setCustomFloors((prev) =>
+      prev.map((f) => (f.name === newLayout.name ? JSON.parse(JSON.stringify(newLayout)) : f)),
+    );
+  }, []);
+
+  // Handler for creating a new custom floor from the modal
+  const handleCreateFloor = useCallback((name: string) => {
+    const newFloor = createEmptyFloor(name);
+    setCustomFloors((prev) => [...prev, newFloor]);
+    setLayout(newFloor);
+    setDisruptions({ blockedExits: [], extraObstacles: [] });
+    setActiveTab('editor');
+    setIsAddFloorOpen(false);
+  }, []);
+
+  // Names of all current layouts for duplicate validation
+  const existingFloorNames = useMemo(() => {
+    return allLayouts.map((l) => l.name);
+  }, [allLayouts]);
+
+  // Persist custom floors to localStorage
+  useEffect(() => {
+    localStorage.setItem('exitlab_custom_floors', JSON.stringify(customFloors));
+  }, [customFloors]);
 
   // Calculate total SPAWN capacity in layout
   const spawnCapacity = useMemo(() => {
@@ -299,7 +346,11 @@ export function App() {
             value={layout.name}
             aria-label="Select layout preset"
             onChange={(e) => {
-              const selected = PRESET_LAYOUTS.find((p) => p.name === e.target.value);
+              if (e.target.value === '__ADD_NEW_FLOOR__') {
+                setIsAddFloorOpen(true);
+                return;
+              }
+              const selected = allLayouts.find((p) => p.name === e.target.value);
               if (selected) {
                 setLayout(JSON.parse(JSON.stringify(selected)));
                 setDisruptions({ blockedExits: [], extraObstacles: [] });
@@ -319,6 +370,21 @@ export function App() {
                 Preset: {p.name}
               </option>
             ))}
+            {customFloors.length > 0 && (
+              <optgroup label="Custom Floors">
+                {customFloors.map((f) => (
+                  <option key={f.name} value={f.name}>
+                    Floor: {f.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            <option
+              value="__ADD_NEW_FLOOR__"
+              style={{ fontWeight: 700, color: '#38bdf8' }}
+            >
+              ＋ Add Floor
+            </option>
           </select>
 
           {/* Tab switcher */}
@@ -427,7 +493,7 @@ export function App() {
           {activeTab === 'editor' ? (
             <FloorPlanEditor
               layout={layout}
-              onChange={setLayout}
+              onChange={handleLayoutChange}
               selectedTool={selectedTool}
               onSelectTool={setSelectedTool}
               isSimulating={isPlaying}
@@ -626,6 +692,12 @@ export function App() {
 
       {/* Modals */}
       <TutorialModal isOpen={isTutorialOpen} onClose={handleCloseTutorial} />
+      <AddFloorModal
+        isOpen={isAddFloorOpen}
+        onClose={() => setIsAddFloorOpen(false)}
+        onCreate={handleCreateFloor}
+        existingNames={existingFloorNames}
+      />
       <ReportModal
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
