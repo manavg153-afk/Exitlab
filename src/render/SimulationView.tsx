@@ -69,6 +69,8 @@ export function SimulationView({
         border: '1px solid #1e293b',
         display: 'flex',
         padding: '1rem',
+        width: '100%',
+        boxSizing: 'border-box',
       }}
     >
       <canvas

@@ -204,9 +204,9 @@ export function FloorPlanEditor({
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', width: '100%', minWidth: 0 }}>
       {/* Tool bar */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', width: '100%' }}>
         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#94a3b8', marginRight: '0.25rem' }}>
           Tools:
         </span>
@@ -293,6 +293,8 @@ export function FloorPlanEditor({
           border: '1px solid #1e293b',
           display: 'flex',
           padding: '1rem',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
         <canvas

@@ -6,8 +6,50 @@
     <title>ExitLab — Evacuation Simulator</title>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; }
-      #root { min-height: 100vh; }
+      html, body {
+        width: 100%;
+        min-height: 100vh;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+      }
+      #root {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .exitlab-app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 1rem 1.5rem;
+      }
+
+      .exitlab-main-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) clamp(340px, 28vw, 420px);
+        gap: 1rem;
+        flex: 1;
+        width: 100%;
+      }
+
+      @media (max-width: 960px) {
+        .exitlab-app-container {
+          padding: 0.75rem 1rem;
+        }
+        .exitlab-main-layout {
+          grid-template-columns: 1fr;
+        }
+      }
 
       @media print {
         body { background: #fff !important; color: #000 !important; }

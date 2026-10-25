@@ -296,16 +296,7 @@ export function App() {
   }, [latestMetrics, baselineMetrics]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        background: '#0f172a',
-        color: '#e2e8f0',
-        padding: '1rem 1.5rem',
-      }}
-    >
+    <div className="exitlab-app-container">
       {/* Top Header */}
       <header
         style={{
@@ -317,6 +308,7 @@ export function App() {
           marginBottom: '1rem',
           flexWrap: 'wrap',
           gap: '0.75rem',
+          width: '100%',
         }}
       >
         <div>
@@ -471,14 +463,7 @@ export function App() {
       </header>
 
       {/* Main Grid: Left Stage (Canvas / Editor) + Right Control Pane */}
-      <main
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '1rem',
-          flex: 1,
-        }}
-      >
+      <main className="exitlab-main-layout">
         {/* Left Column: Editor or Live Canvas */}
         <section
           style={{
@@ -489,6 +474,8 @@ export function App() {
             padding: '1rem',
             border: '1px solid #1e293b',
             minHeight: '520px',
+            minWidth: 0,
+            width: '100%',
           }}
         >
           {activeTab === 'editor' ? (
@@ -500,7 +487,7 @@ export function App() {
               isSimulating={isPlaying}
             />
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', width: '100%', minWidth: 0 }}>
               {/* Playback Controls Toolbar */}
               <div
                 style={{
@@ -653,7 +640,7 @@ export function App() {
         </section>
 
         {/* Right Column: Disruptions & Scenario Settings + Analysis */}
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '380px' }}>
+        <aside style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: 0, width: '100%' }}>
           <ScenarioPanel
             layout={layout}
             scenario={scenario}
@@ -694,6 +681,7 @@ export function App() {
           fontSize: '0.75rem',
           borderTop: '1px solid #1e293b',
           paddingTop: '0.5rem',
+          width: '100%',
         }}
       >
         ExitLab is an educational comparative estimate simulator, not a life-safety certification tool.
